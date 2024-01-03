@@ -7,6 +7,6 @@ import java.util.*;
 public interface ISearchService {
     public Optional<List<SearchTerm>> getAllSearchTerms();
     public Optional<SearchTerm> searchForTerm(SearchTerm searchTerm);
-    public Optional<List<SearchTerm>> getAllSuggestions(int count);
+    public Optional<List<SearchTerm>> getSuggestions();
     public Optional<List<SearchTerm>> performDecayOperation(double decayFactor);
 }
