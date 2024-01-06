@@ -1,5 +1,6 @@
 package com.saadkasu.type_ahead_search_service.Services;
 
+import com.saadkasu.type_ahead_search_service.Configurations.CustomMetadatas.NumericValuesMetadata;
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
 import com.saadkasu.type_ahead_search_service.Repositories.SearchTermRepository;
 import com.saadkasu.type_ahead_search_service.Stratergies.DecayByFactor;
@@ -17,11 +18,13 @@ public class TypeAheadSearchService implements ISearchService{
     private TrieService trieService;
     private IDecayStratergy decayStratergy;
     private SearchTermRepository searchTermRepository;
+    private double defaultWeightage;
     @Autowired
-    public TypeAheadSearchService(TrieService trieService, SearchTermRepository searchTermRepository){
+    public TypeAheadSearchService(SearchTermRepository searchTermRepository){
         this.searchTermRepository = searchTermRepository;
-        this.trieService = trieService;
         this.decayStratergy = new DecayByFactor();
+        defaultWeightage = NumericValuesMetadata.defaultWeightage;
+        this.trieService = new TrieService(getAllSearchTerms());
     }
     @Override
     public Optional<List<SearchTerm>> getAllSearchTerms() {
@@ -31,8 +34,8 @@ public class TypeAheadSearchService implements ISearchService{
 
     @Override
     public Optional<SearchTerm> searchForTerm(SearchTerm searchTerm) {
-        String word = SearchTermUtility.convertSearchTermToWord(searchTerm);
-       SearchTerm searchTermInTrie = trieService.searchForTerm(word);
+       String word = SearchTermUtility.convertSearchTermToWord(searchTerm);
+       SearchTerm searchTermInTrie = trieService.searchForTerm(word,defaultWeightage);
        SearchTerm insertedSearchTerm = searchTermRepository.save(searchTermInTrie);
        return Optional.ofNullable(insertedSearchTerm);
     }
@@ -50,6 +53,7 @@ public class TypeAheadSearchService implements ISearchService{
        if (optionalSearchTerms.isEmpty())
            return optionalSearchTerms;
        List<SearchTerm> searchTermsAfterDecay = decayStratergy.performDecay(optionalSearchTerms.get());
+       searchTermRepository.saveAll(searchTermsAfterDecay);
        return Optional.ofNullable(searchTermsAfterDecay);
     }
 

@@ -16,16 +16,16 @@ public class BaseClass {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @CreatedBy
-    @Column(name = "Created_By", nullable = false, updatable = false)
+    @Column(name = "Created_By", nullable = false,updatable = false)
     private String createdBy;
     @LastModifiedBy
     @Column(name = "Last_Modified_By", nullable = false)
     private String lastModifiedBy;
     @CreatedDate
     @Column(name = "Created_Date", nullable = false, updatable = false)
-    private long createdDate;
+    private java.sql.Date createdDate;
     @LastModifiedDate
     @Column(name = "Last_Modified_Date", nullable = false)
-    private long lastModifiedDate;
+    private java.sql.Date lastModifiedDate;
 
 }

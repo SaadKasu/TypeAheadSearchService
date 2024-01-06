@@ -1,6 +1,7 @@
 package com.saadkasu.type_ahead_search_service.Utility.Trie.Services;
 
-import com.saadkasu.type_ahead_search_service.Configurations.CustomMetadatas.NumberOfSuggestionsMetadata;
+import com.saadkasu.type_ahead_search_service.Configurations.CustomMetadatas.NumericValuesMetadata;
+import com.saadkasu.type_ahead_search_service.Utility.GeneralUtilities.SearchTermUtility;
 import com.saadkasu.type_ahead_search_service.Utility.Helpers.ISortHelper;
 import com.saadkasu.type_ahead_search_service.Utility.Helpers.SortSuggestion;
 import com.saadkasu.type_ahead_search_service.Utility.Trie.Models.Trie;
@@ -16,29 +17,53 @@ public class TrieService {
     private Trie trie;
     private static int noOfSuggestions;
     private ISortHelper sortHelper;
-    public TrieService(){
-        initializeTrie();
-        noOfSuggestions = NumberOfSuggestionsMetadata.noOfSuggestions;
+    public TrieService(Optional<List<SearchTerm>> existingSearchTerms){
+        noOfSuggestions = NumericValuesMetadata.noOfSuggestions;
         sortHelper = new SortSuggestion();
+        initializeTrie(existingSearchTerms);
     }
 
-    private void initializeTrie(){
+    private void initializeTrie(Optional<List<SearchTerm>> existingSearchTerms){
         this.trie = new Trie();
+        if (existingSearchTerms.isEmpty() || existingSearchTerms.get().isEmpty())
+            return;
+        for (SearchTerm searchTerm : existingSearchTerms.get()){
+            addExistingSearchTermToTrie(searchTerm);
+        }
     }
-    public SearchTerm searchForTerm (String word){
-        return traverseWordAndIncrementWeightage(word,0,trie);
+
+    private void addExistingSearchTermToTrie(SearchTerm searchTerm){
+        traverseExistingWordAndAddItToTrie(searchTerm,0,trie);
     }
-    private SearchTerm traverseWordAndIncrementWeightage(String term, int index, Trie node){
+
+    private SearchTerm traverseExistingWordAndAddItToTrie(SearchTerm searchTerm,int index, Trie node){
+        if (index == searchTerm.getWord().length()){
+            node.setStateOfTrie(TrieState.WORD_ENDS);
+            node.setSearchTerm(searchTerm);
+            adjustTopSuggestionsAtNode(searchTerm,node.getTopSuggestions());
+            return searchTerm;
+        }
+        char ch = searchTerm.getWord().charAt(index);
+        if (node.getNextTrieNodes()[ch] == null)
+            node.getNextTrieNodes()[ch] = new Trie();
+        traverseExistingWordAndAddItToTrie(searchTerm,index + 1,node.getNextTrieNodes()[ch]);
+        adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
+        return searchTerm;
+    }
+    public SearchTerm searchForTerm (String word, double weightage){
+        return traverseWordAndIncrementByGivenWeightage(word,0,trie, weightage);
+    }
+    private SearchTerm traverseWordAndIncrementByGivenWeightage(String term, int index, Trie node, double weightage){
         if (index == term.length()){
             SearchTerm searchTerm = getSearchTermAtNode(term, node);
-            searchTerm.setWeightage(searchTerm.getWeightage() + 1);
+            searchTerm = SearchTermUtility.incrementSearchTermWeightage(searchTerm,weightage);
             adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
             return searchTerm;
         }
         char ch = term.charAt(index);
         if (node.getNextTrieNodes()[ch] == null)
             node.getNextTrieNodes()[ch] = new Trie();
-        SearchTerm searchTerm = traverseWordAndIncrementWeightage(term,index + 1,node.getNextTrieNodes()[ch]);
+        SearchTerm searchTerm = traverseWordAndIncrementByGivenWeightage(term,index + 1,node.getNextTrieNodes()[ch],weightage);
         adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
         return searchTerm;
     }
@@ -66,7 +91,7 @@ public class TrieService {
             searchTerm = node.getSearchTerm();
         }
         else{
-            searchTerm = createSearchTerm(term);
+            searchTerm = SearchTermUtility.createSearchTerm(term);
             node.setStateOfTrie(TrieState.WORD_ENDS);
             node.setSearchTerm(searchTerm);
         }
@@ -94,13 +119,6 @@ public class TrieService {
             return new ArrayList<>();
         }
         return traverseWordAndGetSuggestions(term,index + 1,node.getNextTrieNodes()[ch]);
-    }
-
-    private SearchTerm createSearchTerm(String word){
-        SearchTerm searchTerm = new SearchTerm();
-        searchTerm.setWord(word);
-        searchTerm.setWeightage(0);
-        return searchTerm;
     }
 
 }

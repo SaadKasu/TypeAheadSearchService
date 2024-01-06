@@ -18,7 +18,4 @@ public class SearchTerm extends BaseClass{
     private String word;
     @Column(name = "Weightage", nullable = false)
     private double weightage;
-//    @CreatedDate
-//    @Column(name = "First_Date", nullable = false)
-//    private Date firstCreatedDate;
 }

@@ -5,6 +5,8 @@ import com.saadkasu.type_ahead_search_service.DTOs.SearchResponseDTO;
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
 
 import javax.swing.text.html.Option;
+import java.sql.Date;
+import java.text.DateFormat;
 import java.util.*;
 
 public class SearchTermUtility {
@@ -50,4 +52,31 @@ public class SearchTermUtility {
         searchTerm.setWord(searchWord);
         return searchTerm;
     }
+
+    public static SearchTerm createSearchTerm(String word){
+        SearchTerm searchTerm = new SearchTerm();
+        searchTerm.setWord(word);
+        searchTerm.setWeightage(0);
+        setAuditForCreatedTerm(searchTerm);
+        return searchTerm;
+    }
+
+    public static void setAuditForCreatedTerm(SearchTerm searchTerm){
+        searchTerm.setCreatedDate(new Date(new java.util.Date().getTime()));
+        searchTerm.setLastModifiedDate(new Date(new java.util.Date().getTime()));
+        searchTerm.setCreatedBy("System Insert");
+        searchTerm.setLastModifiedBy("System Insert");
+    }
+
+    public static void setAuditForUpdatedTerms(SearchTerm searchTerm){
+        searchTerm.setLastModifiedDate(new Date(new java.util.Date().getTime()));
+        searchTerm.setLastModifiedBy("System Update");
+    }
+
+    public static SearchTerm incrementSearchTermWeightage(SearchTerm searchTerm, double increaseFactor){
+        searchTerm.setWeightage(searchTerm.getWeightage() + increaseFactor);
+        setAuditForUpdatedTerms(searchTerm);
+        return searchTerm;
+    }
+
 }
