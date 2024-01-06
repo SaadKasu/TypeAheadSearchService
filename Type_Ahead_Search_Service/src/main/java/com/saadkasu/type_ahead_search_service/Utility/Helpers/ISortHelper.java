@@ -1,4 +1,4 @@
-package com.saadkasu.type_ahead_search_service.Helpers;
+package com.saadkasu.type_ahead_search_service.Utility.Helpers;
 
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
 

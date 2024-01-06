@@ -1,15 +1,21 @@
 package com.saadkasu.type_ahead_search_service.Stratergies;
 
-import com.saadkasu.type_ahead_search_service.CustomMetadatas.DecayFactorMetadata;
+import com.saadkasu.type_ahead_search_service.Configurations.CustomMetadatas.DecayFactorMetadata;
+import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
+
+import java.util.List;
 
 public class DecayByFactor implements IDecayStratergy{
     private double decayFactor;
 
-    DecayByFactor(){
+    public DecayByFactor(){
         decayFactor =  DecayFactorMetadata.decayFactor;
     }
     @Override
-    public void performDecay() {
-
+    public List<SearchTerm> performDecay(List<SearchTerm> allSearchTerms) {
+        for (SearchTerm searchTerm : allSearchTerms){
+            searchTerm.setWeightage(searchTerm.getWeightage()*(1-decayFactor));
+        }
+        return allSearchTerms;
     }
 }

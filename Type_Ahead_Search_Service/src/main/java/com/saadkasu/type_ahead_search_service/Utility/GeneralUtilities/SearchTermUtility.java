@@ -1,4 +1,4 @@
-package com.saadkasu.type_ahead_search_service.Utility;
+package com.saadkasu.type_ahead_search_service.Utility.GeneralUtilities;
 
 import com.saadkasu.type_ahead_search_service.DTOs.SearchRequestDTO;
 import com.saadkasu.type_ahead_search_service.DTOs.SearchResponseDTO;
@@ -39,5 +39,15 @@ public class SearchTermUtility {
             responseDTOs.add(convertSingleSearchTermToDTO(Optional.of(searchTerm)));
         }
         return responseDTOs;
+    }
+
+    public static String convertSearchTermToWord(SearchTerm searchTerm){
+        return searchTerm.getWord();
+    }
+
+    public static SearchTerm convertStringToSearchTerm(String searchWord){
+        SearchTerm searchTerm = new SearchTerm();
+        searchTerm.setWord(searchWord);
+        return searchTerm;
     }
 }

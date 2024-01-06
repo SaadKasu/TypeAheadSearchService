@@ -1,10 +1,7 @@
-package com.saadkasu.type_ahead_search_service.Utility.Trie;
+package com.saadkasu.type_ahead_search_service.Utility.Trie.Models;
 
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 @Data

@@ -5,7 +5,7 @@ import com.saadkasu.type_ahead_search_service.DTOs.SearchResponseDTO;
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
 import com.saadkasu.type_ahead_search_service.Services.ISearchService;
 import com.saadkasu.type_ahead_search_service.Services.TypeAheadSearchService;
-import com.saadkasu.type_ahead_search_service.Utility.SearchTermUtility;
+import com.saadkasu.type_ahead_search_service.Utility.GeneralUtilities.SearchTermUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -25,8 +25,9 @@ public class TypeAheadSearchController implements ISearchController {
     }
     @GetMapping("/GetSuggestion")
     @Override
-    public ResponseEntity<List<SearchResponseDTO>> getSuggestions() {
-        Optional<List<SearchTerm>> searchTerms = searchService.getSuggestions();
+    public ResponseEntity<List<SearchResponseDTO>> getSuggestions(@RequestParam(name = "term") String searchWord) {
+        SearchTerm searchTerm = SearchTermUtility.convertStringToSearchTerm(searchWord);
+        Optional<List<SearchTerm>> searchTerms = searchService.getSuggestions(searchTerm);
         List<SearchResponseDTO> responseDTOS = SearchTermUtility.convertListOfSearchTermsToDTOs(searchTerms);
         return new ResponseEntity<>(responseDTOS, HttpStatusCode.valueOf(200));
     }
@@ -45,10 +46,10 @@ public class TypeAheadSearchController implements ISearchController {
         List<SearchResponseDTO> responseDTOS = SearchTermUtility.convertListOfSearchTermsToDTOs(optionalSearchTerms);
         return new ResponseEntity<>(responseDTOS,HttpStatusCode.valueOf(200));
     }
-    @PostMapping("/PerformDecay")
+    @GetMapping("/PerformDecay")
     @Override
-    public ResponseEntity<List<SearchResponseDTO>> performDecayOperation(@PathVariable double decayFactor) {
-        Optional<List<SearchTerm>> optionalSearchTerms = searchService.performDecayOperation(decayFactor);
+    public ResponseEntity<List<SearchResponseDTO>> performDecayOperation() {
+        Optional<List<SearchTerm>> optionalSearchTerms = searchService.performDecayOperation();
         List<SearchResponseDTO> responseDTOS = SearchTermUtility.convertListOfSearchTermsToDTOs(optionalSearchTerms);
         return new ResponseEntity<>(responseDTOS,HttpStatusCode.valueOf(200));
     }

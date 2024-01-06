@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.*;
 
 public interface ISearchController {
-    public ResponseEntity<List<SearchResponseDTO>> getSuggestions();
+    public ResponseEntity<List<SearchResponseDTO>> getSuggestions(@RequestParam(name = "term") String searchTerm);
     public ResponseEntity<SearchResponseDTO> searchForTerm(@RequestBody SearchRequestDTO requestDTO);
     public ResponseEntity<List<SearchResponseDTO>> getAllSearchTerms();
-    public ResponseEntity<List<SearchResponseDTO>> performDecayOperation(@PathVariable double decayFactor);
+    public ResponseEntity<List<SearchResponseDTO>> performDecayOperation();
 }
