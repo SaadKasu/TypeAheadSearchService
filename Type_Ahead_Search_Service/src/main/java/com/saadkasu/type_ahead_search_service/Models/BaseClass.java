@@ -13,8 +13,8 @@ import java.util.Date;
 @Data
 public class BaseClass {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     @CreatedBy
     @Column(name = "Created_By", nullable = false,updatable = false)
     private String createdBy;

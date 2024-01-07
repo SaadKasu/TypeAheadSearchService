@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SearchTermRepository extends JpaRepository<SearchTerm,Long> {
-    @Override
-    SearchTerm save(SearchTerm searchTerm);
+public interface ISearchTermRepository extends JpaRepository<SearchTerm,Long> {
+    Optional<SearchTerm> searchByWord(String word);
 }

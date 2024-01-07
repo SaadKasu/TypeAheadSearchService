@@ -17,55 +17,53 @@ public class TrieService {
     private Trie trie;
     private static int noOfSuggestions;
     private ISortHelper sortHelper;
+    private double defaultWeightage;
     public TrieService(Optional<List<SearchTerm>> existingSearchTerms){
         noOfSuggestions = NumericValuesMetadata.noOfSuggestions;
         sortHelper = new SortSuggestion();
-        initializeTrie(existingSearchTerms);
+        defaultWeightage = NumericValuesMetadata.defaultWeightage;
+        buildTrie(existingSearchTerms);
     }
 
-    private void initializeTrie(Optional<List<SearchTerm>> existingSearchTerms){
+    private void buildTrie(Optional<List<SearchTerm>> existingSearchTerms){
         this.trie = new Trie();
         if (existingSearchTerms.isEmpty() || existingSearchTerms.get().isEmpty())
             return;
         for (SearchTerm searchTerm : existingSearchTerms.get()){
-            addExistingSearchTermToTrie(searchTerm);
+            initializeExistingSearchTermsFromDatabase(searchTerm);
         }
     }
 
-    private void addExistingSearchTermToTrie(SearchTerm searchTerm){
-        traverseExistingWordAndAddItToTrie(searchTerm,0,trie);
+    private void initializeExistingSearchTermsFromDatabase(SearchTerm searchTerm){
+        traverseTrieForSearchTerm(searchTerm,0,trie);
     }
 
-    private SearchTerm traverseExistingWordAndAddItToTrie(SearchTerm searchTerm,int index, Trie node){
+    private SearchTerm traverseTrieForSearchTerm(SearchTerm searchTerm,int index, Trie node){
         if (index == searchTerm.getWord().length()){
-            node.setStateOfTrie(TrieState.WORD_ENDS);
-            node.setSearchTerm(searchTerm);
-            adjustTopSuggestionsAtNode(searchTerm,node.getTopSuggestions());
+            searchTerm = insertOrUpdateSearchTerm(searchTerm,node);
+            adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
             return searchTerm;
         }
         char ch = searchTerm.getWord().charAt(index);
         if (node.getNextTrieNodes()[ch] == null)
             node.getNextTrieNodes()[ch] = new Trie();
-        traverseExistingWordAndAddItToTrie(searchTerm,index + 1,node.getNextTrieNodes()[ch]);
+        searchTerm = traverseTrieForSearchTerm(searchTerm,index + 1,node.getNextTrieNodes()[ch]);
         adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
         return searchTerm;
     }
-    public SearchTerm searchForTerm (String word, double weightage){
-        return traverseWordAndIncrementByGivenWeightage(word,0,trie, weightage);
-    }
-    private SearchTerm traverseWordAndIncrementByGivenWeightage(String term, int index, Trie node, double weightage){
-        if (index == term.length()){
-            SearchTerm searchTerm = getSearchTermAtNode(term, node);
-            searchTerm = SearchTermUtility.incrementSearchTermWeightage(searchTerm,weightage);
-            adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
-            return searchTerm;
+
+    private SearchTerm insertOrUpdateSearchTerm(SearchTerm searchTerm, Trie node){
+        if (searchTerm.getId() == null || searchTerm.getId().isEmpty()){
+            searchTerm = SearchTermUtility.createSearchTermWithWeightage(searchTerm.getWord(),defaultWeightage);
         }
-        char ch = term.charAt(index);
-        if (node.getNextTrieNodes()[ch] == null)
-            node.getNextTrieNodes()[ch] = new Trie();
-        SearchTerm searchTerm = traverseWordAndIncrementByGivenWeightage(term,index + 1,node.getNextTrieNodes()[ch],weightage);
-        adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
-        return searchTerm;
+        else{
+            SearchTermUtility.incrementSearchTermWeightage(searchTerm,defaultWeightage);
+        }
+        insertSearchTermAtNode(searchTerm,node);
+        return searchTerm ;
+    }
+    public SearchTerm searchForTerm (SearchTerm searchTerm){
+        return traverseTrieForSearchTerm(searchTerm,0,trie);
     }
 
     private void adjustTopSuggestionsAtNode(SearchTerm searchTerm, ArrayList<SearchTerm> topSuggestions){
@@ -85,17 +83,9 @@ public class TrieService {
         }
     }
 
-    private SearchTerm getSearchTermAtNode(String term, Trie node){
-        SearchTerm searchTerm;
-        if (node.getStateOfTrie() == TrieState.WORD_ENDS){
-            searchTerm = node.getSearchTerm();
-        }
-        else{
-            searchTerm = SearchTermUtility.createSearchTerm(term);
-            node.setStateOfTrie(TrieState.WORD_ENDS);
-            node.setSearchTerm(searchTerm);
-        }
-        return searchTerm;
+    private void insertSearchTermAtNode(SearchTerm searchTerm, Trie node){
+        node.setStateOfTrie(TrieState.WORD_ENDS);
+        node.setSearchTerm(searchTerm);
     }
 
     private boolean searchTermIsPresentAtNode(SearchTerm searchTerm, ArrayList<SearchTerm> topSuggestions){
