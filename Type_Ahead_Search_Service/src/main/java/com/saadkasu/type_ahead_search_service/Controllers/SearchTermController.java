@@ -3,8 +3,8 @@ package com.saadkasu.type_ahead_search_service.Controllers;
 import com.saadkasu.type_ahead_search_service.DTOs.SearchRequestDTO;
 import com.saadkasu.type_ahead_search_service.DTOs.SearchResponseDTO;
 import com.saadkasu.type_ahead_search_service.Models.SearchTerm;
-import com.saadkasu.type_ahead_search_service.Services.ISearchService;
-import com.saadkasu.type_ahead_search_service.Services.TypeAheadSearchService;
+import com.saadkasu.type_ahead_search_service.Services.ISearchTermService;
+import com.saadkasu.type_ahead_search_service.Services.SearchTermService;
 import com.saadkasu.type_ahead_search_service.Utility.GeneralUtilities.SearchTermUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -16,11 +16,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/TypeAheadSearch")
-public class TypeAheadSearchController implements ISearchController {
+public class SearchTermController implements ISearchTermController {
 
-    private final ISearchService searchService;
+    private final ISearchTermService searchService;
     @Autowired
-    TypeAheadSearchController(TypeAheadSearchService searchService){
+    SearchTermController(SearchTermService searchService){
         this.searchService = searchService;
     }
     @GetMapping("/GetSuggestion")
