@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.saadkasu.type_ahead_search_service.Models.*;
 
+import java.sql.Date;
 import java.util.*;
 
 @Service
@@ -54,15 +55,37 @@ public class TrieService {
     }
 
     private SearchTerm insertOrUpdateSearchTerm(SearchTerm searchTerm, Trie node,TrieOperation trieOperation){
-        if (searchTerm.getId() == null || searchTerm.getId().isEmpty()){
-            searchTerm = SearchTermUtility.createSearchTermWithWeightage(searchTerm.getWord(),defaultWeightage);
+        if (trieOperation == TrieOperation.INITIALIZE){
+            insertSearchTermAtNode(searchTerm,node);
         }
         else{
-            SearchTermUtility.incrementSearchTermWeightage(searchTerm,defaultWeightage);
+            searchTerm = conditionsForIfSearchTermIsAddedOrUpdated(searchTerm,node);
         }
-        insertSearchTermAtNode(searchTerm,node);
         return searchTerm ;
     }
+
+    private SearchTerm conditionsForIfSearchTermIsAddedOrUpdated(SearchTerm searchTerm, Trie node){
+        if (searchTerm.getId() == null || searchTerm.getId().isBlank()){ // Newly added word
+            searchTerm = SearchTermUtility.createSearchTermWithWeightage(searchTerm.getWord(),defaultWeightage);
+            insertSearchTermAtNode(searchTerm,node);
+        }
+        else{
+            if (node.getStateOfTrie() == TrieState.WORD_DOES_NOT_END){ // Word is present in DB but not in memory
+                SearchTermUtility.incrementSearchTermWeightage(searchTerm,defaultWeightage);
+                insertSearchTermAtNode(searchTerm,node);
+            }
+            else{ // Normal search term weightage update
+
+                if (searchTerm.getWeightage() > node.getSearchTerm().getWeightage()){
+                    node.getSearchTerm().setWeightage(searchTerm.getWeightage());
+                }
+                searchTerm = node.getSearchTerm();
+                SearchTermUtility.incrementSearchTermWeightage(node.getSearchTerm(),defaultWeightage);
+            }
+        }
+        return searchTerm;
+    }
+
     public SearchTerm searchForTerm (SearchTerm searchTerm){
         return traverseTrieForSearchTerm(searchTerm,0,trie,TrieOperation.UPSERT);
     }

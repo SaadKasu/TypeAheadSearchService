@@ -80,7 +80,7 @@ public class SearchTermUtility {
     }
 
     public static void incrementSearchTermWeightage(SearchTerm searchTerm, double increaseFactor){
-        double newWeightage = (double) Math.round(100 * (searchTerm.getWeightage() + increaseFactor)) /(double) 100;
+        //double newWeightage = (double) Math.round(100 * (searchTerm.getWeightage() + increaseFactor)) /(double) 100;
         searchTerm.setWeightage(searchTerm.getWeightage() + increaseFactor);
         setAuditForUpdatedTerms(searchTerm);
     }
