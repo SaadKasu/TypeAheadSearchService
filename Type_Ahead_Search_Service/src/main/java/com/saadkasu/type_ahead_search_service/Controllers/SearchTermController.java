@@ -20,7 +20,7 @@ public class SearchTermController implements ISearchTermController {
 
     private final ISearchTermService searchService;
     @Autowired
-    SearchTermController(SearchTermService searchService){
+    public SearchTermController(SearchTermService searchService){
         this.searchService = searchService;
     }
     @GetMapping("/GetSuggestion")

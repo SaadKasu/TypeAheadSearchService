@@ -5,6 +5,7 @@ import com.saadkasu.type_ahead_search_service.Utility.GeneralUtilities.SearchTer
 import com.saadkasu.type_ahead_search_service.Utility.Helpers.ISortHelper;
 import com.saadkasu.type_ahead_search_service.Utility.Helpers.SortSuggestion;
 import com.saadkasu.type_ahead_search_service.Utility.Trie.Models.Trie;
+import com.saadkasu.type_ahead_search_service.Utility.Trie.Models.TrieOperation;
 import com.saadkasu.type_ahead_search_service.Utility.Trie.Models.TrieState;
 import org.springframework.stereotype.Service;
 
@@ -35,24 +36,24 @@ public class TrieService {
     }
 
     private void initializeExistingSearchTermsFromDatabase(SearchTerm searchTerm){
-        traverseTrieForSearchTerm(searchTerm,0,trie);
+        traverseTrieForSearchTerm(searchTerm,0,trie, TrieOperation.INITIALIZE);
     }
 
-    private SearchTerm traverseTrieForSearchTerm(SearchTerm searchTerm,int index, Trie node){
+    private SearchTerm traverseTrieForSearchTerm(SearchTerm searchTerm,int index, Trie node,TrieOperation trieOperation){
         if (index == searchTerm.getWord().length()){
-            searchTerm = insertOrUpdateSearchTerm(searchTerm,node);
+            searchTerm = insertOrUpdateSearchTerm(searchTerm,node,trieOperation);
             adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
             return searchTerm;
         }
         char ch = searchTerm.getWord().charAt(index);
         if (node.getNextTrieNodes()[ch] == null)
             node.getNextTrieNodes()[ch] = new Trie();
-        searchTerm = traverseTrieForSearchTerm(searchTerm,index + 1,node.getNextTrieNodes()[ch]);
+        searchTerm = traverseTrieForSearchTerm(searchTerm,index + 1,node.getNextTrieNodes()[ch],trieOperation);
         adjustTopSuggestionsAtNode(searchTerm, node.getTopSuggestions());
         return searchTerm;
     }
 
-    private SearchTerm insertOrUpdateSearchTerm(SearchTerm searchTerm, Trie node){
+    private SearchTerm insertOrUpdateSearchTerm(SearchTerm searchTerm, Trie node,TrieOperation trieOperation){
         if (searchTerm.getId() == null || searchTerm.getId().isEmpty()){
             searchTerm = SearchTermUtility.createSearchTermWithWeightage(searchTerm.getWord(),defaultWeightage);
         }
@@ -63,7 +64,7 @@ public class TrieService {
         return searchTerm ;
     }
     public SearchTerm searchForTerm (SearchTerm searchTerm){
-        return traverseTrieForSearchTerm(searchTerm,0,trie);
+        return traverseTrieForSearchTerm(searchTerm,0,trie,TrieOperation.UPSERT);
     }
 
     private void adjustTopSuggestionsAtNode(SearchTerm searchTerm, ArrayList<SearchTerm> topSuggestions){

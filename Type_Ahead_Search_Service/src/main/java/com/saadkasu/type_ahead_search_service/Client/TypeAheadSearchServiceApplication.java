@@ -1,5 +1,7 @@
 package com.saadkasu.type_ahead_search_service.Client;
 
+import com.saadkasu.type_ahead_search_service.Controllers.ISearchTermController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;

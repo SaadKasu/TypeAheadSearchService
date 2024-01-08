@@ -19,8 +19,8 @@ public class SearchTermService implements ISearchTermService {
 
     private TrieService trieService;
     private IDecayStratergy decayStratergy;
+
     private ISearchTermRepository searchTermRepository;
-    @Autowired
     public SearchTermService(ISearchTermRepository searchTermRepository){
         this.searchTermRepository = searchTermRepository;
         this.decayStratergy = new DecayByFactor();
@@ -42,7 +42,7 @@ public class SearchTermService implements ISearchTermService {
 
     @Override
     public Optional<List<SearchTerm>> getSuggestions(SearchTerm searchTerm) {
-        String searchWord = searchTerm.getWord();
+       String searchWord = searchTerm.getWord();
        List<SearchTerm> searchTerms = trieService.getSuggestions(searchWord);
        return Optional.ofNullable(searchTerms);
     }
