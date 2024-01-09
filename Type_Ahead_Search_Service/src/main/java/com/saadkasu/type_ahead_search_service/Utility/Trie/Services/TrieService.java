@@ -59,12 +59,12 @@ public class TrieService {
             insertSearchTermAtNode(searchTerm,node);
         }
         else{
-            searchTerm = conditionsForIfSearchTermIsAddedOrUpdated(searchTerm,node);
+            searchTerm = syncSearchTermAcrossInstances(searchTerm,node);
         }
         return searchTerm ;
     }
 
-    private SearchTerm conditionsForIfSearchTermIsAddedOrUpdated(SearchTerm searchTerm, Trie node){
+    private SearchTerm syncSearchTermAcrossInstances(SearchTerm searchTerm, Trie node){
         if (searchTerm.getId() == null || searchTerm.getId().isBlank()){ // Newly added word
             searchTerm = SearchTermUtility.createSearchTermWithWeightage(searchTerm.getWord(),defaultWeightage);
             insertSearchTermAtNode(searchTerm,node);
