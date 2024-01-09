@@ -33,8 +33,8 @@ public class SearchTermService implements ISearchTermService {
     }
 
     @Override
-    public synchronized Optional<SearchTerm> searchForTerm(SearchTerm searchTerm) {
-       SearchTerm mostRecentSearchTerm = getMostRecentSearchTerm(searchTerm);
+    public Optional<SearchTerm> searchForTerm(SearchTerm searchTerm) {
+       SearchTerm mostRecentSearchTerm = syncSearchTermsFromAcrossInstances(searchTerm);
        SearchTerm searchTermInTrie = trieService.searchForTerm(mostRecentSearchTerm);
        SearchTerm insertedSearchTerm = saveSearchTermToDatabase(searchTermInTrie);
        return Optional.ofNullable(insertedSearchTerm);
@@ -61,7 +61,7 @@ public class SearchTermService implements ISearchTermService {
         return searchTermRepository.save(searchTerm);
     }
 
-    private SearchTerm getMostRecentSearchTerm(SearchTerm searchTerm){
+    private SearchTerm syncSearchTermsFromAcrossInstances(SearchTerm searchTerm){
         Optional<SearchTerm> optionalSearchTerm = searchTermRepository.searchByWord(searchTerm.getWord());
         if (optionalSearchTerm.isEmpty())
             return searchTerm;

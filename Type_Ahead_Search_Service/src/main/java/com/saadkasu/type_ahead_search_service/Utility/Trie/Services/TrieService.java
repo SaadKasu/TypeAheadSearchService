@@ -75,10 +75,7 @@ public class TrieService {
                 insertSearchTermAtNode(searchTerm,node);
             }
             else{ // Normal search term weightage update
-
-                if (searchTerm.getWeightage() > node.getSearchTerm().getWeightage()){
-                    node.getSearchTerm().setWeightage(searchTerm.getWeightage());
-                }
+                node.getSearchTerm().setWeightage(searchTerm.getWeightage());
                 searchTerm = node.getSearchTerm();
                 SearchTermUtility.incrementSearchTermWeightage(node.getSearchTerm(),defaultWeightage);
             }

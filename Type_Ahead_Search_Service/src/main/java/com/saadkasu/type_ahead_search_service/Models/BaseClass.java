@@ -23,9 +23,9 @@ public class BaseClass {
     private String lastModifiedBy;
     @CreatedDate
     @Column(name = "Created_Date", nullable = false, updatable = false)
-    private java.sql.Date createdDate;
+    private Date createdDate;
     @LastModifiedDate
     @Column(name = "Last_Modified_Date", nullable = false)
-    private java.sql.Date lastModifiedDate;
+    private Date lastModifiedDate;
 
 }

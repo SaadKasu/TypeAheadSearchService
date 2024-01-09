@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import lombok.Data;
 
-@Entity(name = "Search_Terms")
+@Entity(name = "SearchTerms")
 @Data
 @EntityListeners(AuditorAwareImplementation.class)
 public class SearchTerm extends BaseClass{
